@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import ElevatorInterface, { Direction } from "@/interfaces/ElevatorInterface";
+import ElevatorInterface from "@/interfaces/ElevatorInterface";
+import ElevatorPath, { Direction } from "@/interfaces/ElevatorPath";
 import Person from "@/interfaces/Person";
 import FloorInterface from "@/interfaces/FloorInterface";
 
@@ -10,13 +11,15 @@ export interface BuildingStates {
   elevator: ElevatorInterface;
   allFloors: FloorInterface[];
   waitingPersons: Map<FloorInterface, Person[]>;
+  personsWaitingForElevator: Map<FloorInterface, Person[]>;
 }
 
 export default new Vuex.Store({
   state: {
     elevator: {} as ElevatorInterface,
     allFloors: [] as FloorInterface[],
-    waitingPersons: new Map<FloorInterface, Person[]>() as Map<FloorInterface, Person[]>
+    waitingPersons: new Map<FloorInterface, Person[]>() as Map<FloorInterface, Person[]>,
+    personsWaitingForElevator: new Map<FloorInterface, Person[]>() as Map<FloorInterface, Person[]>
   },
   mutations: {
     updateFloors(state: BuildingStates, floors: FloorInterface[]): void {
@@ -27,7 +30,10 @@ export default new Vuex.Store({
     },
     updateElevator(state: BuildingStates, elevator: ElevatorInterface): void {
       state.elevator = elevator;
-    }
+    },
+    updatePersonsWaitingForElevator(state: BuildingStates, waitingPersons: Map<FloorInterface, Person[]>): void {
+      state.personsWaitingForElevator = waitingPersons;
+    },
   },
   actions: {
     initStateValues(context: any): void {
@@ -65,7 +71,10 @@ export default new Vuex.Store({
           },
           targetFloor: null,
           transportedPersons: [],
-          direction: Direction.STOPPED
+          path: {
+            direction: Direction.STOPPED,
+            path: []
+          }
         };
 
         return elevator;
@@ -102,10 +111,10 @@ export default new Vuex.Store({
       context.commit("updateWaitingPersons", initWaitingPersons());
       context.commit("updateElevator", initElevator());
     },
-    elevatorProcess(context: any, person: Person): void {
+    // elevatorProcess(context: any, person: Person): void {
 
-      // context.commit("updateElevator", elevator);
-    }
+    //   // context.commit("updateElevator", elevator);
+    // }
   },
   modules: {}
 });

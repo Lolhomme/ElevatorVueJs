@@ -1,14 +1,10 @@
 import FloorInterface from "./FloorInterface";
 import Person from "./Person";
+import ElevatorPath from "./ElevatorPath";
 
-export enum Direction {
-    UP,
-    DOWN,
-    STOPPED
-  }
 export default interface ElevatorInterface {
     actualFloor: FloorInterface;
     targetFloor: FloorInterface | null;
     transportedPersons: Person[];
-    direction: Direction;
+    path: ElevatorPath;
 }
