@@ -17,7 +17,7 @@
       </div>
     </div>
     <div class="column is-4">
-        <Elevator v-show="elevator.actualFloor.number === floor.number" />
+      <Elevator v-show="elevator.actualFloor.number === floor.number" />
     </div>
   </div>
 </template>
@@ -47,9 +47,11 @@ export default class FloorBuidling extends Vue {
   }
 
   get otherFloors(): FloorInterface[] {
-    const otherFloors: FloorInterface[] = this.$store.state.allFloors.filter((floor: FloorInterface) => {
+    const otherFloors: FloorInterface[] = this.$store.state.allFloors.filter(
+      (floor: FloorInterface) => {
         return floor.number != this.floor.number;
-    });
+      }
+    );
 
     return otherFloors.reverse();
   }
@@ -57,54 +59,78 @@ export default class FloorBuidling extends Vue {
   elevatorProcess(floor: FloorInterface): void {
     this.setPerson(floor);
     if (this.elevator.path.direction === Direction.STOPPED) {
-        this.callElevator(this.floor);
-        this.getPeopleInElevator();
+      this.callElevator();
+      this.getPeopleInElevator();
     }
   }
 
   getElevatorPath(targetFloor: FloorInterface): ElevatorPath {
-      const allFloors: FloorInterface[] = this.$store.state.allFloors;
-      const returnedPath: ElevatorPath = {direction: Direction.STOPPED, path: []};
+    const allFloors: FloorInterface[] = this.$store.state.allFloors;
+    const returnedPath: ElevatorPath = {
+      direction: Direction.STOPPED,
+      path: []
+    };
     //   elevator is on ground floor
-      if(this.elevator.actualFloor.number === 0) {
-          returnedPath.path = allFloors.filter((floor: FloorInterface) => {
-              if (floor.number <= targetFloor.number && floor.number != this.elevator.actualFloor.number) {
-                  return floor;
-              }
-          }).sort((a: FloorInterface, b: FloorInterface) => a.number - b.number);
-          returnedPath.direction = Direction.UP;
-    //   elevator is on last floor
-      } else if (this.elevator.actualFloor.number === allFloors.length - 1) {
-          returnedPath.path = allFloors.filter((floor: FloorInterface) => {
-              if (floor.number >= targetFloor.number && floor.number != this.elevator.actualFloor.number) {
-                  return floor;
-              }
-          });
-          returnedPath.direction = Direction.DOWN;
-      } else if (this.elevator.actualFloor.number > 0 && this.elevator.actualFloor.number < allFloors.length - 1) {
-        //   lift need to go up
-          if(targetFloor.number > this.elevator.actualFloor.number) {
-            returnedPath.path = allFloors.filter((floor: FloorInterface) => {
-              if ((floor.number > this.elevator.actualFloor.number && floor.number <= targetFloor.number) && floor.number != this.elevator.actualFloor.number) {
-                return floor;
-              }
-            }).sort((a: FloorInterface, b: FloorInterface) => a.number - b.number);
-            returnedPath.direction = Direction.UP;
-        //   lift need to go down
-          } else if(targetFloor.number < this.elevator.actualFloor.number) {
-            returnedPath.path = allFloors.filter((floor: FloorInterface) => {
-              if ((floor.number < this.elevator.actualFloor.number && floor.number >= targetFloor.number) && floor.number != this.elevator.actualFloor.number) {
-                return floor;
-              }
-            });
-            returnedPath.direction = Direction.DOWN;
+    if (this.elevator.actualFloor.number === 0) {
+      returnedPath.path = allFloors
+        .filter((floor: FloorInterface) => {
+          if (
+            floor.number <= targetFloor.number &&
+            floor.number != this.elevator.actualFloor.number
+          ) {
+            return floor;
           }
+        })
+        .sort((a: FloorInterface, b: FloorInterface) => a.number - b.number);
+      returnedPath.direction = Direction.UP;
+      //   elevator is on last floor
+    } else if (this.elevator.actualFloor.number === allFloors.length - 1) {
+      returnedPath.path = allFloors.filter((floor: FloorInterface) => {
+        if (
+          floor.number >= targetFloor.number &&
+          floor.number != this.elevator.actualFloor.number
+        ) {
+          return floor;
+        }
+      });
+      returnedPath.direction = Direction.DOWN;
+    } else if (
+      this.elevator.actualFloor.number > 0 &&
+      this.elevator.actualFloor.number < allFloors.length - 1
+    ) {
+      //   lift need to go up
+      if (targetFloor.number > this.elevator.actualFloor.number) {
+        returnedPath.path = allFloors
+          .filter((floor: FloorInterface) => {
+            if (
+              floor.number > this.elevator.actualFloor.number &&
+              floor.number <= targetFloor.number &&
+              floor.number != this.elevator.actualFloor.number
+            ) {
+              return floor;
+            }
+          })
+          .sort((a: FloorInterface, b: FloorInterface) => a.number - b.number);
+        returnedPath.direction = Direction.UP;
+        //   lift need to go down
+      } else if (targetFloor.number < this.elevator.actualFloor.number) {
+        returnedPath.path = allFloors.filter((floor: FloorInterface) => {
+          if (
+            floor.number < this.elevator.actualFloor.number &&
+            floor.number >= targetFloor.number &&
+            floor.number != this.elevator.actualFloor.number
+          ) {
+            return floor;
+          }
+        });
+        returnedPath.direction = Direction.DOWN;
       }
+    }
 
-      return returnedPath;
+    return returnedPath;
   }
 
-  callElevator(floor: FloorInterface): void {
+  callElevator(): void {
     const path: ElevatorPath = this.getElevatorPath(this.floor);
     this.elevator.path = path;
     this.moveElevator();
@@ -112,17 +138,17 @@ export default class FloorBuidling extends Vue {
 
   moveElevator(): void {
     this.elevator.path.path.forEach((floor: FloorInterface) => {
-        console.log(floor.number);
-        this.elevator.actualFloor = floor;
-        this.$store.commit('updateElevator', this.elevator);
+      console.log(floor.number);
+      this.elevator.actualFloor = floor;
+      this.$store.commit("updateElevator", this.elevator);
     });
-    this.elevator.path = { direction: Direction.STOPPED, path: []};
-    this.$store.commit('updateElevator', this.elevator);
+    this.elevator.path = { direction: Direction.STOPPED, path: [] };
+    this.$store.commit("updateElevator", this.elevator);
   }
 
   setPerson(floor: FloorInterface): Person {
     this.waitingPersons[0].targetFloor = floor;
-    this.$store.dispatch('upWaitingPersons', this.waitingPersons);
+    this.$store.dispatch("upWaitingPersons", this.waitingPersons);
 
     return this.waitingPersons[0];
   }
@@ -130,16 +156,18 @@ export default class FloorBuidling extends Vue {
   getPeopleInElevator(): void {
     const allFloors: FloorInterface[] = this.$store.state.allFloors;
     if (this.floor.number === 0 || this.floor.number === allFloors.length - 1) {
-        this.waitingPersons.forEach((person: Person) => {
-            if(person.targetFloor != null) {
-                this.elevator.transportedPersons.push(person);
-            }
-        });
-        const tmpPersons: Person[] = this.waitingPersons.filter((person: Person) => {
-            return person.targetFloor === null;
-        })
-        this.$store.dispatch('upWaitingPersons', tmpPersons);
-        this.$store.commit('updateElevator', this.elevator);
+      this.waitingPersons.forEach((person: Person) => {
+        if (person.targetFloor != null) {
+          this.elevator.transportedPersons.push(person);
+        }
+      });
+      const tmpPersons: Person[] = this.waitingPersons.filter(
+        (person: Person) => {
+          return person.targetFloor === null;
+        }
+      );
+      this.$store.dispatch("upWaitingPersons", tmpPersons);
+      this.$store.commit("updateElevator", this.elevator);
     }
   }
 }

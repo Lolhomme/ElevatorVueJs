@@ -1,4 +1,4 @@
 export default interface FloorInterface {
-    number: number;
-    name: string
+  number: number;
+  name: string;
 }

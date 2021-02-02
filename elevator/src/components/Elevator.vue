@@ -1,8 +1,8 @@
 <template>
   <div class="elevator">
     <li v-for="person of elevator.transportedPersons" :key="person.id">
-        <span>{{ person.id }}</span>
-        <img src="../assets/human-male.png" />
+      <span>{{ person.id }}</span>
+      <img src="../assets/human-male.png" />
     </li>
     <img id="elevator" src="../assets/elevator.png" />
   </div>

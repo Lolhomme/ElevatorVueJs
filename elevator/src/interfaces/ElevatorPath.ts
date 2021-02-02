@@ -1,11 +1,11 @@
 import FloorInterface from "./FloorInterface";
 
 export enum Direction {
-    UP,
-    DOWN,
-    STOPPED
+  UP,
+  DOWN,
+  STOPPED
 }
 export default interface ElevatorPath {
-    direction: Direction;
-    path: FloorInterface[]
-  }
+  direction: Direction;
+  path: FloorInterface[];
+}
