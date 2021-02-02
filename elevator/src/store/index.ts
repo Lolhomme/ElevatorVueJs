@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import ElevatorInterface from "@/interfaces/ElevatorInterface";
-import ElevatorPath, { Direction } from "@/interfaces/ElevatorPath";
+import { Direction } from "@/interfaces/ElevatorPath";
 import Person from "@/interfaces/Person";
 import FloorInterface from "@/interfaces/FloorInterface";
 
@@ -11,7 +11,6 @@ export interface BuildingStates {
   elevator: ElevatorInterface;
   allFloors: FloorInterface[];
   waitingPersons: Map<FloorInterface, Person[]>;
-  personsWaitingForElevator: Map<FloorInterface, Person[]>;
 }
 
 export default new Vuex.Store({
@@ -19,7 +18,6 @@ export default new Vuex.Store({
     elevator: {} as ElevatorInterface,
     allFloors: [] as FloorInterface[],
     waitingPersons: new Map<FloorInterface, Person[]>() as Map<FloorInterface, Person[]>,
-    personsWaitingForElevator: new Map<FloorInterface, Person[]>() as Map<FloorInterface, Person[]>
   },
   mutations: {
     updateFloors(state: BuildingStates, floors: FloorInterface[]): void {
@@ -30,10 +28,7 @@ export default new Vuex.Store({
     },
     updateElevator(state: BuildingStates, elevator: ElevatorInterface): void {
       state.elevator = elevator;
-    },
-    updatePersonsWaitingForElevator(state: BuildingStates, waitingPersons: Map<FloorInterface, Person[]>): void {
-      state.personsWaitingForElevator = waitingPersons;
-    },
+    }
   },
   actions: {
     initStateValues(context: any): void {
@@ -111,10 +106,13 @@ export default new Vuex.Store({
       context.commit("updateWaitingPersons", initWaitingPersons());
       context.commit("updateElevator", initElevator());
     },
-    // elevatorProcess(context: any, person: Person): void {
+    upWaitingPersons(context: any, persons: Person[]): void {
+      const tmpMap: Map<FloorInterface, Person[]> = context.state.waitingPersons;
+      tmpMap.delete(persons[0].actualFloor);
+      tmpMap.set(persons[0].actualFloor, persons);
 
-    //   // context.commit("updateElevator", elevator);
-    // }
+      context.commit("updateWaitingPersons", tmpMap);
+    },
   },
   modules: {}
 });

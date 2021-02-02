@@ -55,17 +55,11 @@ export default class FloorBuidling extends Vue {
   }
 
   elevatorProcess(floor: FloorInterface): void {
-    const person: Person = this.setPerson(floor);
+    this.setPerson(floor);
     if (this.elevator.path.direction === Direction.STOPPED) {
         this.callElevator(this.floor);
+        this.getPeopleInElevator();
     }
-    // const path: FloorInterface[] = this.getElevatorPath(floor);
-    // path.forEach((floor: FloorInterface) => {
-    //     console.log(floor.number)
-    //     this.goToTheNextFloor(floor);
-    // })
-    // this.$store.dispatch('elevatorProcess', person);
-    // this.$forceUpdate();
   }
 
   getElevatorPath(targetFloor: FloorInterface): ElevatorPath {
@@ -127,9 +121,26 @@ export default class FloorBuidling extends Vue {
   }
 
   setPerson(floor: FloorInterface): Person {
-      this.waitingPersons[0].targetFloor = floor;
+    this.waitingPersons[0].targetFloor = floor;
+    this.$store.dispatch('upWaitingPersons', this.waitingPersons);
 
-      return this.waitingPersons[0];
+    return this.waitingPersons[0];
+  }
+
+  getPeopleInElevator(): void {
+    const allFloors: FloorInterface[] = this.$store.state.allFloors;
+    if (this.floor.number === 0 || this.floor.number === allFloors.length - 1) {
+        this.waitingPersons.forEach((person: Person) => {
+            if(person.targetFloor != null) {
+                this.elevator.transportedPersons.push(person);
+            }
+        });
+        const tmpPersons: Person[] = this.waitingPersons.filter((person: Person) => {
+            return person.targetFloor === null;
+        })
+        this.$store.dispatch('upWaitingPersons', tmpPersons);
+        this.$store.commit('updateElevator', this.elevator);
+    }
   }
 }
 </script>
@@ -147,8 +158,5 @@ li {
 }
 li {
   text-align: center;
-}
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .5s;
 }
 </style>
